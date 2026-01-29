@@ -37,7 +37,6 @@ const DOC_EXTENSIONS = [
   ".ppt",
   ".odp",
 ];
-const ALLOWED_EXTS = new Set([".pdf", ...IMG_EXTENSIONS, ...DOC_EXTENSIONS]);
 
 const activePrintJobs = new Map();
 
@@ -197,11 +196,6 @@ app.use((req, res, next) => {
 
 const upload = multer({
   dest: path.join(__dirname, "uploads"),
-  fileFilter: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (ALLOWED_EXTS.has(ext)) cb(null, true);
-    else cb(new Error(`Unsupported file type: ${ext}`), false);
-  },
 });
 
 app.use(express.json());
@@ -281,12 +275,12 @@ async function ensurePdf(fileObj) {
     if (fs.existsSync(correctExtPath)) fs.unlink(correctExtPath, () => {});
     return outputPdfPath;
   }
-  if (IMG_EXTENSIONS.includes(ext)) {
-    await convertImageToPdf(correctExtPath, outputPdfPath);
-    if (fs.existsSync(correctExtPath)) fs.unlink(correctExtPath, () => {});
-    return outputPdfPath;
-  }
-  return fileObj.path;
+
+  await convertImageToPdf(correctExtPath, outputPdfPath);
+  if (fs.existsSync(correctExtPath)) fs.unlink(correctExtPath, () => {});
+  return outputPdfPath;
+  
+  // return fileObj.path;
 }
 
 app.get("/printers", async (req, res) => {
