@@ -289,6 +289,8 @@ async function ensurePdf(fileObj) {
   return fileObj.path;
 }
 
+
+// Get Printers info
 app.get("/printers", async (req, res) => {
   try {
     const printers = await getPrinters();
@@ -297,6 +299,8 @@ app.get("/printers", async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+
 
 app.post("/count-pages", upload.single("file"), async (req, res, next) => {
   try {
